@@ -1,0 +1,143 @@
+<template>
+    <div>
+        <div class="row">
+            <router-link to="/store-product" class="btn btn-primary">Add Stock</router-link>
+
+        </div>
+        <br>
+        <input class="form-control" v-model="searchTerm" style="width: 300px;" type="text" placeholder="Search Here">
+
+        <div class="container-fluid" id="container-wrapper">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Stock</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th> Code</th>
+                                    <th>Category</th>
+                                    <th>Quant.</th>
+                                    <th style="text-align: center">Status</th>
+
+                                    <th style="text-align: center">Buying Price.</th>
+                                    <th>Image</th>
+                                    <th>Action</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="product in filterSearch" :key="product.id">
+                                    <td>{{product.product_name}}</td>
+                                    <td>{{product.product_code}}</td>
+                                    <td>{{product.category_name}}</td>
+                                    <td>{{product.product_quantity}}</td>
+
+                                    <td v-if="product.product_quantity > 10">
+                                        <span class="badge badge-success">Available</span>
+                                    </td>
+
+                                    <td v-else-if="product.product_quantity >1 && product.product_quantity < 5">
+                                        <span class="badge badge-warning">Low</span>
+                                    </td>
+                                    <td v-else="product.product_quantity <1">
+                                        <span class="badge badge-danger">Stock Out</span>
+                                    </td>
+
+                                    <td>{{product.buying_price}}</td>
+                                    <td><img :src="product.image" id="product_image" style="width: 70px; height: 70px;">
+                                    </td>
+                                    <!--                                    <td><span class="badge badge-success">Delivered</span></td>-->
+                                    <td>
+
+                                        <router-link :to="{name:'edit-stock', params:{id:product.id}}"
+                                                     class="btn btn-sm btn-info">Edit
+                                        </router-link>
+
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer"></div>
+                    </div>
+                </div>
+            </div>
+            <!--Row-->
+        </div>
+
+
+    </div>
+</template>
+
+
+<script type="text/javascript">
+
+    export default {
+
+        created() {
+            if (!User.loggedIn()) {
+                this.$router.push('home')
+            }
+
+            this.allProducts();
+
+        },
+        data() {
+            return {
+                products: [],
+                categories: [],
+                suppliers: [],
+                searchTerm: ''
+
+            }
+
+        },
+        computed: {
+            filterSearch() {
+                return this.products.filter(product => {
+                    return product.product_name.match(this.searchTerm)
+
+                })
+            }
+        },
+        methods: {
+            allProducts() {
+                axios.get('/api/product/')
+                    .then(({data}) => (this.products = data))
+                    .catch()
+
+            },
+
+
+        },
+
+
+    }
+
+
+</script>
+
+
+<style type="text/css">
+    #em_photo {
+        height: 40px;
+        width: 40px;
+    }
+
+    a.btn.btn-sm {
+        color: white;
+    }
+
+
+</style>
